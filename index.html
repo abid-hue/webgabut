@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Our Love Story 📖 | Special for You</title>
+  <meta name="description" content="Sebuah buku kenangan romantis interaktif berkonsep flipbook dengan foto dan lagu I Lay My Love On You - Westlife.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
+  
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+  <!-- Canvas for Petals & Floating Sparkles -->
+  <canvas id="ambientCanvas"></canvas>
+  <canvas id="sparkleCanvas"></canvas>
+
+  <!-- Audio Element -->
+  <audio id="bgMusic" preload="auto">
+    <source src="assets/audio/i_lay_my_love_on_you.mp3" type="audio/mpeg">
+    Your browser does not support audio element.
+  </audio>
+
+  <!-- INTRO SCREEN: Romantic Envelope -->
+  <div id="introScreen" class="intro-screen">
+    <div class="intro-backdrop"></div>
+    <div class="intro-card-container">
+      <div class="envelope-wrapper" id="envelopeWrapper">
+        <div class="envelope" id="envelope">
+          <div class="envelope-flap"></div>
+          <div class="envelope-pocket"></div>
+          <div class="letter-preview">
+            <span class="preview-heart">💖</span>
+            <p class="preview-text">Untuk Kamu yang Paling Berharga ✨</p>
+          </div>
+          <div class="wax-seal" id="waxSeal">
+            <span class="seal-inner">💌</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="intro-caption">
+        <h1 class="intro-title">Sebuah Surat Kecil Untukmu</h1>
+        <p class="intro-subtitle">Sentuh amplop di atas atau klik tombol di bawah untuk membuka kisah kita 💫</p>
+        <button id="openBookBtn" class="btn-romantic-pulse" aria-label="Buka Surat & Putar Lagu">
+          <span class="btn-icon">✨</span>
+          <span class="btn-text">Buka Surat & Putar Lagu</span>
+          <span class="btn-icon">🎵</span>
+        </button>
+        <p class="audio-hint">💡 Gunakan earphone/speaker untuk pengalaman terbaik!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING MUSIC PLAYER BAR -->
+  <div id="musicWidget" class="music-widget">
+    <div class="vinyl-record-wrap">
+      <div class="vinyl-record" id="vinylRecord">
+        <div class="vinyl-grooves"></div>
+        <div class="vinyl-center-art" style="background-image: url('assets/images/photo_1.jpg');"></div>
+      </div>
+      <div class="vinyl-arm" id="vinylArm"></div>
+    </div>
+    
+    <div class="track-details">
+      <div class="track-meta">
+        <span class="track-title">I Lay My Love On You</span>
+        <span class="track-artist">Westlife • Special For You</span>
+      </div>
+      
+      <div class="track-scrubber-row">
+        <span id="currentTimeDisplay" class="time-label">0:00</span>
+        <div class="progress-bar-container" id="progressBarContainer">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <span id="totalTimeDisplay" class="time-label">3:18</span>
+      </div>
+    </div>
+
+    <div class="music-actions">
+      <button id="playPauseBtn" class="btn-icon-control" title="Putar/Jeda" aria-label="Play or Pause">
+        <svg id="playIcon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg id="pauseIcon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="display:none;">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+      </button>
+      
+      <button id="jumpChorusBtn" class="btn-pill-action" title="Lompat ke Lirik Utama">
+        <span>Reff 🎶</span>
+      </button>
+
+      <button id="soundFxBtn" class="btn-icon-control" title="Efek Suara Kertas" aria-label="Toggle Sound Effects">
+        <span id="soundFxIcon">🔊</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOP BAR QUICK CONTROLS -->
+  <header class="top-nav-bar">
+    <div class="nav-branding">
+      <span class="brand-sparkle">✨</span>
+      <span class="brand-text">Our Love Story</span>
+    </div>
+    <div class="nav-actions">
+      <button id="toggleLyricsDrawerBtn" class="nav-btn" title="Buka Panel Lirik">
+        <span>🎤 Lirik</span>
+      </button>
+      <button id="navSecretMsgBtn" class="nav-btn" title="Buka Pesan Rahasia">
+        <span>💌 Pesan Rahasia</span>
+      </button>
+      <button id="toggleSparklesBtn" class="nav-btn" title="Kelopak Bunga & Partikel">
+        <span>🌸 Efek</span>
+      </button>
+      <button id="heartBurstBtn" class="nav-btn nav-btn-highlight" title="Kirim Sejuta Cinta">
+        <span>💖 Kirim Cinta</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN FLIPBOOK AREA -->
+  <main class="flipbook-scene">
+    <!-- Desk Wood / Velvet Mat Background -->
+    <div class="desk-mat"></div>
+
+    <!-- The 3D Book Component -->
+    <div class="book-viewport" id="bookViewport">
+      <div class="book" id="book">
+        
+        <!-- ================= SHEET 0: FRONT COVER & INSIDE COVER ================= -->
+        <div class="sheet sheet-cover" id="sheet-0" data-page-index="0">
+          <!-- COVER FRONT -->
+          <div class="page-face page-front cover-front">
+            <div class="cover-border-ornament"></div>
+            <div class="cover-emboss-frame">
+              <div class="cover-badge-icon">📖</div>
+              <p class="cover-pretitle">A Sweet Collection of Memories</p>
+              <h2 class="cover-title">OUR LOVE<br>STORY</h2>
+              <div class="cover-divider">
+                <span>✦</span>
+                <span class="divider-heart">❤️</span>
+                <span>✦</span>
+              </div>
+              <p class="cover-subtitle">Khusus Untuk Kamu, Alasan Terindah di Balik Bahagiaku ✨</p>
+              
+              <div class="cover-ribbon-tag">
+                <span>Westlife Edition • I Lay My Love On You</span>
+              </div>
+              
+              <div class="cover-tap-prompt">
+                <span class="finger-tap-icon">👉</span>
+                <span class="tap-text">Sentuh untuk membuka lembaran</span>
+              </div>
+            </div>
+            <div class="cover-corner corner-tl"></div>
+            <div class="cover-corner corner-tr"></div>
+            <div class="cover-corner corner-bl"></div>
+            <div class="cover-corner corner-br"></div>
+          </div>
+          
+          <!-- COVER INSIDE (LEFT PAGE OF SPREAD 1) -->
+          <div class="page-face page-back inside-cover-page">
+            <div class="paper-texture"></div>
+            <div class="page-content">
+              <div class="polaroid-card polaroid-tilt-left" data-photo="1">
+                <div class="washi-tape tape-top-center"></div>
+                <div class="polaroid-photo-wrap">
+                  <img src="assets/images/photo_1.jpg" alt="Foto Cantik 1" class="polaroid-img img-focus-photo-1" loading="lazy">
+                </div>
+                <div class="polaroid-caption">
+                  <span class="handwritten-script">senyumanm maniss... </span>
+                  <span class="heart-stamp">❤️</span>
+                </div>
+              </div>
+              
+              <div class="page-doodles">
+                <span class="doodle-star">✨</span>
+                <span class="sticker-tag tag-pink">My Favorite Girl</span>
+              </div>
+              <div class="page-footer-num">Hal. 1</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SHEET 1: SPREAD 1 RIGHT & SPREAD 2 LEFT ================= -->
+        <div class="sheet" id="sheet-1" data-page-index="1">
+          <!-- FRONT: RIGHT PAGE OF SPREAD 1 -->
+          <div class="page-face page-front standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content letter-layout">
+              <div class="letter-header">
+                <span class="letter-date">Dear My Sweetheart,</span>
+              </div>
+              
+              <div class="letter-body">
+                <p class="letter-paragraph">
+                  dari sekian banyak hal di dunia ini, melihat senyummu adalah salah satu keajaiban paling indah yang selalu ku syukuri setiap hari.
+                </p>
+                <p class="letter-paragraph">
+                  warna burgundy yang kamu kenakan di foto ini rasanya pas banget sama kehangatan yang selalu kamu bawa ke hidupku. setiap kali aku capek atau hariku berat, cukup liat wajah manismu ini, seketika duniaku jadi terasa damai lagi.
+                </p>
+              </div>
+
+              <!-- Interactive Hug Button -->
+              <div class="interactive-page-widget">
+                <button class="btn-interactive-widget" id="sendHugBtn">
+                  <span>kirim Peluk Hangat</span>
+                </button>
+                <span class="widget-hint">sentuh untuk merasakan kehangatannya!</span>
+              </div>
+
+              <div class="letter-signature">
+                <p class="sign-text">selalu mengagumimu,</p>
+                <span class="sign-name">yang selalu sayang sama kamuu</span>
+              </div>
+              <div class="page-footer-num">Hal. 2</div>
+            </div>
+          </div>
+
+          <!-- BACK: LEFT PAGE OF SPREAD 2 -->
+          <div class="page-face page-back standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content">
+              <div class="polaroid-card polaroid-tilt-right" data-photo="2">
+                <div class="washi-tape tape-top-left"></div>
+                <div class="washi-tape tape-bottom-right"></div>
+                <div class="polaroid-photo-wrap">
+                  <img src="assets/images/photo_2.jpg" alt="Foto Cantik 2" class="polaroid-img img-focus-photo-2" loading="lazy">
+                </div>
+                <div class="polaroid-caption">
+                  <span class="handwritten-script">mata yang indah di balik kacamata</span>
+                </div>
+              </div>
+              
+              <div class="sticker-collection">
+                <span class="sticker-stamp">VERIFIED 100% CANTIK</span>
+              </div>
+              <div class="page-footer-num">Hal. 3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SHEET 2: SPREAD 2 RIGHT & SPREAD 3 LEFT ================= -->
+        <div class="sheet" id="sheet-2" data-page-index="2">
+          <!-- FRONT: RIGHT PAGE OF SPREAD 2 -->
+          <div class="page-face page-front standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content letter-layout">
+              <div class="letter-header">
+                <span class="letter-date">Catatan Hati 02</span>
+              </div>
+              
+              <div class="letter-body">
+                <p class="letter-paragraph">
+                  ada sesuatu yang luar biasa memikat dari caramu tersenyum dengan kacamata bulat itu.
+                </p>
+                <p class="letter-paragraph">
+                  makin hari bukannya biasa aja, rasa kagum dan sayangku ke kamu justru terus tumbuh. kamu itu definisi rumah ternyaman buat hatiku bersandar.
+                </p>
+              </div>
+
+              <!-- Interactive Love Reason Secret Scratch/Reveal -->
+              <div class="secret-note-box" id="secretNoteBox1">
+                <div class="secret-note-front" id="secretNoteFront1">
+                  <span>💌 buka catatan rahasia</span>
+                </div>
+                <div class="secret-note-back" id="secretNoteBack1">
+                  <span>"kamu selalu jadi alasan utama kenapa hariku terasa berharga."</span>
+                </div>
+              </div>
+
+              <div class="page-footer-num">Hal. 4</div>
+            </div>
+          </div>
+
+          <!-- BACK: LEFT PAGE OF SPREAD 3 -->
+          <div class="page-face page-back standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content">
+              <div class="polaroid-card polaroid-tilt-left" data-photo="3">
+                <div class="washi-tape tape-top-right"></div>
+                <div class="polaroid-photo-wrap">
+                  <img src="assets/images/photo_3.jpg" alt="Foto Cantik 3" class="polaroid-img img-focus-photo-3" loading="lazy">
+                </div>
+                <div class="polaroid-caption">
+                  <span class="handwritten-script">manis bangettt</span>
+                </div>
+              </div>
+
+              <div class="sticker-tag tag-purple">warning: gula pun kalah maniss</div>
+              <div class="page-footer-num">Hal. 5</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SHEET 3: SPREAD 3 RIGHT & SPREAD 4 LEFT ================= -->
+        <div class="sheet" id="sheet-3" data-page-index="3">
+          <!-- FRONT: RIGHT PAGE OF SPREAD 3 -->
+          <div class="page-face page-front standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content letter-layout">
+              <div class="letter-header">
+              </div>
+              
+              <div class="letter-body">
+                <p class="letter-paragraph">
+                 ini semisal ngurangin gula kalau liat kamu tetep kena diabetes 
+                </p>
+                <p class="letter-paragraph">
+                  terimakasihh ya sudah selalu menghadirkan tawa dan tingkah manismu. jangan pernah hilangin sisi ceria ini ya!
+                </p>
+              </div>
+
+              <!-- Interactive Gemoy Meter Widget -->
+              <div class="gemoy-meter-widget">
+                <div class="meter-label-row">
+                  <span>tingkat kemanisan nyaa</span>
+                  <span id="gemoyScore">1000% (Unlimited) </span>
+                </div>
+                <div class="meter-bar-track">
+                  <div class="meter-bar-fill" id="gemoyMeterFill"></div>
+                </div>
+                <button class="btn-meter-boost" id="boostGemoyBtn">
+                  <span>tiap hari makin manis diabetes nanti mahh akuu</span>
+                </button>
+              </div>
+
+              <div class="page-footer-num">Hal. 6</div>
+            </div>
+          </div>
+
+          <!-- BACK: LEFT PAGE OF SPREAD 4 -->
+          <div class="page-face page-back standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content">
+              <div class="polaroid-card polaroid-tilt-right" data-photo="4">
+                <div class="washi-tape tape-top-center"></div>
+                <div class="polaroid-photo-wrap">
+                  <img src="assets/images/photo_4.jpg" alt="Foto Cantik 4" class="polaroid-img img-focus-photo-4" loading="lazy">
+                </div>
+                <div class="polaroid-caption">
+                  <span class="handwritten-script">pose imup </span>
+                  <span class="heart-stamp">🌸</span>
+                </div>
+              </div>
+
+              <div class="sticker-tag tag-peach">pose: cewe siapa sih inii</div>
+              <div class="page-footer-num">Hal. 7</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SHEET 4: SPREAD 4 RIGHT & SPREAD 5 LEFT ================= -->
+        <div class="sheet" id="sheet-4" data-page-index="4">
+          <!-- FRONT: RIGHT PAGE OF SPREAD 4 -->
+          <div class="page-face page-front standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content letter-layout">
+              <div class="letter-header">
+                <span class="letter-date">huhhh </span>
+              </div>
+              
+              <div class="letter-body">
+                <p class="letter-paragraph">
+                  kalo suatu saat kamu lagi ngerasa capek, bad mood, atau butuh teman bicara, ingat ya: aku selalu di sini, siap jadi tempat ceritamu tanpa pernah bosan.
+                </p>
+              </div>
+
+              <div class="page-footer-num">Hal. 8</div>
+            </div>
+          </div>
+
+          <!-- BACK: LEFT PAGE OF SPREAD 5 -->
+          <div class="page-face page-back standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content">
+              <div class="polaroid-card polaroid-tilt-left" data-photo="5">
+                <div class="washi-tape tape-top-left"></div>
+                <div class="polaroid-photo-wrap">
+                  <img src="assets/images/photo_5.jpg" alt="Foto Cantik 5" class="polaroid-img img-focus-photo-5" loading="lazy">
+                </div>
+                <div class="polaroid-caption">
+                  <span class="handwritten-script">bahkan saat hari batik pun yang istimewa kamu bukan hari batik nya</span>
+                  <span class="heart-stamp">🌻</span>
+                </div>
+              </div>
+
+              <div class="sticker-stamp stamp-green">semisal rating kecantikan antara cewe di seluruh dunia juga kamu masuk S-TIER</div>
+              <div class="page-footer-num">Hal. 9</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SHEET 5: SPREAD 5 RIGHT & SPREAD 6 LEFT (CLIMAX / LYRICS) ================= -->
+        <div class="sheet" id="sheet-5" data-page-index="5">
+          <!-- FRONT: RIGHT PAGE OF SPREAD 5 -->
+          <div class="page-face page-front standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content letter-layout">
+              <div class="letter-header">
+                <span class="letter-date">hari batikk</span>
+              </div>
+              
+              <div class="letter-body">
+                <p class="letter-paragraph">
+                 terimakasi suda menerima aku apa adanyaa, kamu tetep cantik kok walau pakek make up atau tidak aku selalu memandang mu cantik dari sisi manapun
+                </p>
+              </div>
+
+              <!-- Interactive Sweet Love Quiz -->
+              <div class="love-quiz-box">
+                <p class="quiz-q">pertanyaan: siapa orang paling cantik sihh di bumi?</p>
+                <div class="quiz-options">
+                  <button class="quiz-btn" id="quizBtn1">firaa</button>
+                  <button class="quiz-btn" id="quizBtn2">kamuu</button>
+                </div>
+                <p id="quizAnswer" class="quiz-answer"></p>
+              </div>
+
+              <div class="page-footer-num">Hal. 10</div>
+            </div>
+          </div>
+
+          <!-- BACK: LEFT PAGE OF SPREAD 6 (SPECIAL WESTLIFE SONG & LYRICS PAGE) -->
+          <div class="page-face page-back lyrics-special-page">
+            <div class="paper-texture"></div>
+            <div class="page-content lyrics-container">
+              <div class="lyrics-header">
+                <span class="music-icon-spin">🎵</span>
+                <h3 class="lyrics-title">I Lay My Love On You</h3>
+                <span class="lyrics-artist">Westlife • Our Song</span>
+              </div>
+              
+              <!-- Real-time Synchronized Karaoke Lyrics Display -->
+              <div class="lyrics-box" id="lyricsScrollBox">
+                <div class="lyric-line" data-start="53" data-end="57">
+                  <span class="lyric-text">"I lay my love on you</span>
+                </div>
+                <div class="lyric-line" data-start="57" data-end="60">
+                  <span class="lyric-text">It's all I wanna do</span>
+                </div>
+                <div class="lyric-line" data-start="60" data-end="66">
+                  <span class="lyric-text">Every time I breathe I feel brand new</span>
+                </div>
+                <div class="lyric-line" data-start="66" data-end="69">
+                  <span class="lyric-text">You opened up my heart</span>
+                </div>
+                <div class="lyric-line" data-start="69" data-end="75">
+                  <span class="lyric-text">Show me all your love and walk right through</span>
+                </div>
+                <div class="lyric-line" data-start="75" data-end="82">
+                  <span class="lyric-text">As I lay my love on you</span>
+                </div>
+                <div class="lyric-line" data-start="34" data-end="38">
+                  <span class="lyric-text">I was lost in a lonely place</span>
+                </div>
+                <div class="lyric-line" data-start="38" data-end="41">
+                  <span class="lyric-text">Could hardly believe it, yeah</span>
+                </div>
+                <div class="lyric-line" data-start="41" data-end="45">
+                  <span class="lyric-text">Holding on to yesterday</span>
+                </div>
+                <div class="lyric-line" data-start="45" data-end="49">
+                  <span class="lyric-text">Far, far too long"</span>
+                </div>
+              </div>
+
+              <div class="lyrics-hint">
+                <span>klik baris lirik mana pun untuk memutar lirik tersebut!</span>
+              </div>
+              <div class="page-footer-num">Hal. 11</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SHEET 6: SPREAD 6 RIGHT & BACK COVER ================= -->
+        <div class="sheet sheet-back-cover" id="sheet-6" data-page-index="6">
+          <!-- FRONT: RIGHT PAGE OF SPREAD 6 (ROMANTIC VOW & FIREWORK CLIMAX) -->
+          <div class="page-face page-front standard-page">
+            <div class="paper-texture"></div>
+            <div class="page-content letter-layout">
+              <div class="letter-header">
+                <span class="letter-date">janji hatiku</span>
+                <h3 class="letter-title">aku akan selalu mencintai mu dan menyayangimu</h3>
+              </div>
+              
+              <div class="letter-body">
+                <p class="letter-paragraph">
+                  lagu westlife ini bener-bener mewakili apa yang kurasakan sejak kamu hadir. hatiku yang dulu sunyi, sekarang selalu dipenuhi kehangatan dan rasa bahagia.
+                </p>
+                <p class="letter-paragraph">
+                  <em>"As I lay my love on you..."</em> seluruh rasa sayang, perhatian, dan kesetiaanku, ku titipkan hanya untukmu seorang.
+                </p>
+              </div>
+
+              <!-- Climax Button: Infinite Hearts Burst -->
+              <div class="climax-action-wrap">
+                <button class="btn-climax-heart" id="climaxHeartBtn">
+                  <span class="heart-pulse-anim">💖</span>
+                  <span>kirim sejuta cinta untukmu!</span>
+                </button>
+                <span class="climax-hint">sentuh untuk kejutan kembang api cinta! </span>
+                <button class="btn-interactive-widget" id="page12SecretBtn" style="margin-top: 8px;">
+                  <span>💌 Buka Bisikan Cinta Rahasia</span>
+                </button>
+              </div>
+
+              <div class="letter-signature">
+                <p class="sign-text">selamanya milikmu,</p>
+                <span class="sign-name">aku yang selalu menyayangimu </span>
+              </div>
+              <div class="page-footer-num">Hal. 12</div>
+            </div>
+          </div>
+
+          <!-- BACK: BACK COVER OF THE BOOK -->
+          <div class="page-face page-back cover-back">
+            <div class="cover-border-ornament"></div>
+            <div class="cover-back-content">
+              <div class="gold-wax-seal">
+                <span>❤️</span>
+              </div>
+              <h3 class="back-cover-title">Forever & Always</h3>
+              <p class="back-cover-text">
+                "terimakasihh sudah menjadi bagian terindah dalam hidupku. senyummu adalah duniaku."
+              </p>
+              
+              <div class="back-cover-actions">
+                <button class="btn-back-action" id="replayBookBtn">
+                  <span>🔄 baca dari awal</span>
+                </button>
+                <button class="btn-back-action" id="secretModalBtn">
+                  <span>💌 pesan rahasia</span>
+                </button>
+              </div>
+
+              <div class="cover-tagline">Made with boundless love exclusively for you ✨</div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- /#book -->
+    </div> <!-- /#bookViewport -->
+
+    <!-- NAVIGATION CONTROLS -->
+    <div class="book-nav-bar">
+      <button id="prevPageBtn" class="nav-arrow-btn" aria-label="Halaman Sebelumnya" disabled>
+        <span class="arrow-icon">❮</span>
+        <span class="arrow-label">Sebelumnya</span>
+      </button>
+
+      <div class="page-indicator-pill">
+        <span id="pageCurrentLabel">Halaman Sampul</span>
+        <div class="page-dots-wrap" id="pageDotsWrap"></div>
+      </div>
+
+      <button id="nextPageBtn" class="nav-arrow-btn" aria-label="Halaman Selanjutnya">
+        <span class="arrow-label">Selanjutnya</span>
+        <span class="arrow-icon">❯</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- POPUP MODAL: PHOTO EXPAND MODAL -->
+  <div id="photoModal" class="modal-backdrop">
+    <div class="modal-card">
+      <button id="closeModalBtn" class="modal-close-btn" aria-label="Tutup Modal">×</button>
+      <div class="modal-image-wrap">
+        <img id="modalImg" src="" alt="Detail Foto" class="modal-img">
+      </div>
+      <p id="modalCaption" class="modal-caption"></p>
+    </div>
+  </div>
+
+  <!-- POPUP MODAL: SECRET MESSAGE MODAL -->
+  <div id="secretMessageModal" class="modal-backdrop">
+    <div class="modal-card secret-modal-card">
+      <button id="closeSecretModalBtn" class="modal-close-btn" aria-label="Tutup Modal">×</button>
+      <div class="secret-card-inner">
+        <span class="secret-icon">💌</span>
+        <h3 class="secret-title">bisikan Cinta Untukmu</h3>
+        <p class="secret-content">
+          "kalau suatu saat kamu merasa dunia ini terlalu berisik atau melelahkan, ingat ya... kamu selalu punya aku. kamu gak perlu pura-pura kuat di depanku. kamu boleh cerita apa saja, menangis kalau butuh, atau sekadar diam bersandar di bahuku. aku akan selalu ada untukmu, hari ini, esok, dan selamanya."
+        </p>
+        <div class="secret-footer">
+          <span>Love you so much, my dearest! 💖✨</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING LYRICS DRAWER -->
+  <div id="lyricsDrawer" class="lyrics-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-row">
+        <span>🎤 Lirik Lagu - I Lay My Love On You</span>
+      </div>
+      <button id="closeLyricsDrawerBtn" class="drawer-close-btn">×</button>
+    </div>
+    <div class="drawer-body" id="drawerLyricsList">
+      <!-- Full song lyrics lines rendered dynamically -->
+    </div>
+  </div>
+
+  <script src="script.js?v=3"></script>
+</body>
+</html>
